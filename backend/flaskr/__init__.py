@@ -44,7 +44,7 @@ def create_app(test_config=None):
   #-------------------------------------------------------------------------------#
   # Categories.
   #-------------------------------------------------------------------------------#
-  @app.route('/categories')
+  @app.route('/categories', methods=['GET'])
   def get_categories():
       categories = Category.query.order_by(Category.id).all()
       categories_dict = {}
