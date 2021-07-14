@@ -97,7 +97,7 @@ GET '/questions?page=${integer}'
     'categories': { '1' : "Science",
     '2' : "Art",
     '3' : "Geography",
-    '4' : "History",
+    '4' : " ",
     '5' : "Entertainment",
     '6' : "Sports" },
     'currentCategory': 'History'
