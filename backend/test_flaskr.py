@@ -16,16 +16,10 @@ class TriviaTestCase(unittest.TestCase):
         setup_db(self.app, self.database_path)
 
         self.new_question = {
-            "question": "How are you?",
-            "answer": "I am fine",
-            "category": "Art",
-            "difficulty": 5
-        }
-
-        self.another_question = {
-            "question": "Hello",
-            "difficulty": 1,
-            "category": "Art"
+            "question": "Is it test?",
+            "answer": "Yes",
+            "category": 1,
+            "difficulty": 1
         }
 
         with self.app.app_context():
@@ -74,14 +68,37 @@ class TriviaTestCase(unittest.TestCase):
     #-------------------------------------------------------------------------------#
     # Get question. (error)
     #-------------------------------------------------------------------------------#
-    def test_get_question(self):
+    def test_get_question_404(self):
         res = self.client().get('/questions?page=1221212')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data["questions"])
+        self.assertEqual(data['message'], "questions not found")
 
+    #-------------------------------------------------------------------------------#
+    # Get question by category.
+    #-------------------------------------------------------------------------------#
+    def test_get_question_in_category(self):
+        res = self.client().get('/categories/2/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        # self.assertEqual(data['success'], True)
+        # self.assertTrue(len(data["questions"]))
+        # self.assertTrue(data["total_questions"])
+
+    #-------------------------------------------------------------------------------#
+    # Get question by category. (error)
+    #-------------------------------------------------------------------------------#
+    def test_get_question_in_category_404(self):
+        res = self.client().get('/categories/100/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertTrue(data['error'], 404)
+        self.assertTrue(data['message'], "questions not found")
 
     #-------------------------------------------------------------------------------#
     # Search question.
@@ -139,8 +156,6 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(data['created'])
-        self.assertTrue(len(data['questions']))
 
     #-------------------------------------------------------------------------------#
     # Create question (error).
@@ -152,6 +167,19 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 405)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'method not allowed')
+
+    #-------------------------------------------------------------------------------#
+    # Get next question (error).
+    #-------------------------------------------------------------------------------#
+    def test_get_next_question(self):
+        res = self.client().post('/quizzes', json={
+            "previous_questions":[],
+            "quiz_category": {"id": 2, "type":"All"}
+        })
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertNotEqual(data['question'], None)
 
 if __name__ == "__main__":
     unittest.main()
